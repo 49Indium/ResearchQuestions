@@ -358,7 +358,7 @@ export default function Home() {
     <div className="mx-auto w-full max-w-2xl px-4 py-6">
       <header className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-semibold dark:text-zinc-100">Research Questions</h1>
+          <h1 className="text-lg font-semibold dark:text-zinc-100"><a href="/">Research Questions</a></h1>
           <p className="text-xs text-zinc-500">Capture questions fast. Explore them later.</p>
         </div>
         <div className="flex gap-2">
