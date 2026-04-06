@@ -139,6 +139,7 @@ export default function Home() {
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const questionCountRef = useRef(0);
   const focusedQuestionIdRef = useRef<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const handleQuestionCount = useCallback((count: number) => {
     questionCountRef.current = count;
@@ -301,6 +302,58 @@ export default function Home() {
     window.open(`/print?ids=${ids}`, "_blank");
   }, [selected]);
 
+  const handleExportJSON = useCallback(async () => {
+    if (selected.size === 0) return;
+    setLoading("json");
+    try {
+      const data = await fetchBatch(Array.from(selected.keys()));
+      const exportData = {
+        version: 1,
+        exported_at: new Date().toISOString(),
+        questions: data.map((q) => ({
+          text: q.text,
+          source: q.source || undefined,
+          status: q.status,
+          tags: q.tags && q.tags.length > 0 ? q.tags : undefined,
+          notes: q.notes.length > 0 ? q.notes.map((n) => ({ content: n.content })) : undefined,
+        })),
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+      downloadBlob(blob, "research-questions.json");
+    } finally {
+      setLoading(null);
+    }
+  }, [selected]);
+
+  const handleImportJSON = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading("import");
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const res = await fetch("/api/questions/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(`Import failed: ${err.error}`);
+        return;
+      }
+      const result = await res.json();
+      alert(`Imported ${result.imported} question${result.imported === 1 ? "" : "s"}`);
+      refresh();
+    } catch {
+      alert("Import failed: invalid JSON file");
+    } finally {
+      setLoading(null);
+      // Reset the input so the same file can be imported again
+      if (importInputRef.current) importInputRef.current.value = "";
+    }
+  }, [refresh]);
+
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6">
       <header className="mb-6 flex items-start justify-between">
@@ -316,6 +369,21 @@ export default function Home() {
           >
             <span className="font-serif text-sm tracking-tight">T<span className="relative -mx-0.5" style={{ fontSize: "0.8em", top: "0.22em" }}>E</span>X</span>
           </button>
+          <button
+            onClick={() => importInputRef.current?.click()}
+            disabled={loading !== null}
+            title="Import questions from JSON"
+            className="rounded-md border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-700 disabled:opacity-40 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:text-zinc-300"
+          >
+            {loading === "import" ? "Importing..." : "Import"}
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportJSON}
+            className="hidden"
+          />
           <button
             onClick={toggleSelectMode}
             className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
@@ -358,6 +426,13 @@ export default function Home() {
             className="rounded border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             PDF
+          </button>
+          <button
+            onClick={handleExportJSON}
+            disabled={selected.size === 0 || loading !== null}
+            className="rounded border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            {loading === "json" ? "Exporting..." : "Export JSON"}
           </button>
         </div>
       )}
