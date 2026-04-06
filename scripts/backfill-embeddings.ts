@@ -39,10 +39,10 @@ async function main() {
     return new Float32Array(output.data as Float64Array);
   }
 
-  const deleteQuestion = db.prepare(`DELETE FROM vec_questions WHERE question_id = CAST(? AS INTEGER)`);
-  const insertQuestion = db.prepare(`INSERT INTO vec_questions (question_id, embedding) VALUES (CAST(? AS INTEGER), ?)`);
-  const deleteNote = db.prepare(`DELETE FROM vec_notes WHERE note_id = CAST(? AS INTEGER)`);
-  const insertNote = db.prepare(`INSERT INTO vec_notes (note_id, embedding) VALUES (CAST(? AS INTEGER), ?)`);
+  const deleteQuestion = db.prepare(`DELETE FROM vec_questions WHERE question_id = ?`);
+  const insertQuestion = db.prepare(`INSERT INTO vec_questions (question_id, embedding) VALUES (?, ?)`);
+  const deleteNote = db.prepare(`DELETE FROM vec_notes WHERE note_id = ?`);
+  const insertNote = db.prepare(`INSERT INTO vec_notes (note_id, embedding) VALUES (?, ?)`);
 
   // Backfill questions
   const questions = db.prepare(`
@@ -51,7 +51,7 @@ async function main() {
     LEFT JOIN question_tags qt ON qt.question_id = q.id
     LEFT JOIN tags t ON t.id = qt.tag_id
     GROUP BY q.id
-  `).all() as { id: number; text: string; source: string; tags: string | null }[];
+  `).all() as { id: string; text: string; source: string; tags: string | null }[];
 
   console.log(`Embedding ${questions.length} questions...`);
   for (let i = 0; i < questions.length; i++) {
@@ -62,9 +62,8 @@ async function main() {
     const prepared = "search_document: " + parts.join(" | ");
 
     const vec = await embed(prepared);
-    const qid = Number(q.id);
-    deleteQuestion.run(qid);
-    insertQuestion.run(qid, Buffer.from(vec.buffer));
+    deleteQuestion.run(q.id);
+    insertQuestion.run(q.id, Buffer.from(vec.buffer));
 
     if ((i + 1) % 10 === 0 || i === questions.length - 1) {
       console.log(`  Questions: ${i + 1}/${questions.length}`);
@@ -76,7 +75,7 @@ async function main() {
     SELECT n.id, n.content, q.text as question_text
     FROM notes n
     JOIN questions q ON q.id = n.question_id
-  `).all() as { id: number; content: string; question_text: string }[];
+  `).all() as { id: string; content: string; question_text: string }[];
 
   console.log(`Embedding ${notes.length} notes...`);
   for (let i = 0; i < notes.length; i++) {
@@ -84,9 +83,8 @@ async function main() {
     const prepared = "search_document: " + stripLatex(n.content) + " | " + stripLatex(n.question_text);
 
     const vec = await embed(prepared);
-    const nid = Number(n.id);
-    deleteNote.run(nid);
-    insertNote.run(nid, Buffer.from(vec.buffer));
+    deleteNote.run(n.id);
+    insertNote.run(n.id, Buffer.from(vec.buffer));
 
     if ((i + 1) % 10 === 0 || i === notes.length - 1) {
       console.log(`  Notes: ${i + 1}/${notes.length}`);
