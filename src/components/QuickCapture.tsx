@@ -5,11 +5,11 @@ import LatexRenderer from "./LatexRenderer";
 
 interface QuickCaptureProps {
   onCreated?: () => void;
-  parentId?: number | null;
+  linkTo?: string | null;
   placeholder?: string;
 }
 
-export default function QuickCapture({ onCreated, parentId = null, placeholder }: QuickCaptureProps) {
+export default function QuickCapture({ onCreated, linkTo = null, placeholder }: QuickCaptureProps) {
   const [text, setText] = useState("");
   const [source, setSource] = useState("");
   const [showSource, setShowSource] = useState(false);
@@ -26,7 +26,7 @@ export default function QuickCapture({ onCreated, parentId = null, placeholder }
         body: JSON.stringify({
           text: text.trim(),
           source: source.trim() || undefined,
-          parent_id: parentId,
+          link_to: linkTo,
         }),
       });
       if (res.ok) {
@@ -39,7 +39,7 @@ export default function QuickCapture({ onCreated, parentId = null, placeholder }
       setSubmitting(false);
       textareaRef.current?.focus();
     }
-  }, [text, source, parentId, submitting, onCreated]);
+  }, [text, source, linkTo, submitting, onCreated]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -80,10 +80,11 @@ export default function QuickCapture({ onCreated, parentId = null, placeholder }
         <button
           type="button"
           onClick={submit}
-          disabled={!text.trim() || submitting}
+          disabled={text.trim().length === 0 || submitting}
+          suppressHydrationWarning
           className="rounded-md bg-zinc-900 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         >
-          {submitting ? "Saving..." : "Save (⌘↵)"}
+          {submitting ? "Saving..." : "Save (Ctrl+Enter)"}
         </button>
       </div>
 

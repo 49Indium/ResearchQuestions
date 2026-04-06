@@ -4,7 +4,7 @@ import { useState } from "react";
 import LatexRenderer from "./LatexRenderer";
 
 interface NoteEditorProps {
-  questionId: number;
+  questionId: string;
   onCreated?: () => void;
 }
 

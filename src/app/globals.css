@@ -30,3 +30,53 @@ body {
 .katex {
   font-size: 1em;
 }
+
+/* Print styles */
+@page {
+  margin: 1in;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .print-title {
+    color: black !important;
+    font-size: 16pt !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .print-question {
+    page-break-inside: avoid;
+    color: black !important;
+  }
+
+  .print-note {
+    border-color: #999 !important;
+    color: #333 !important;
+  }
+
+  .print-tag {
+    border: 1px solid #ccc !important;
+    background: transparent !important;
+    color: #555 !important;
+  }
+
+  .katex {
+    color: black !important;
+  }
+}

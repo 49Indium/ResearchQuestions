@@ -3,7 +3,27 @@
     "allow": [
       "Bash(npm --version)",
       "Bash(printf 'N\\\\nN\\\\nN\\\\nN\\\\n')",
-      "Bash(npx create-next-app@latest . --ts --tailwind --app --src-dir --use-npm --eslint --no-turbopack --import-alias \"@/*\")"
+      "Bash(npx create-next-app@latest . --ts --tailwind --app --src-dir --use-npm --eslint --no-turbopack --import-alias \"@/*\")",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(find C:UsersisaacDocumentsCodingquestions -maxdepth 1 -type f -name .env*)",
+      "Bash(find C:UsersisaacDocumentsCodingquestions/src -name *.ts -o -name *.tsx)",
+      "Bash(grep -r \"better-sqlite3\\\\|Database\" C:UsersisaacDocumentsCodingquestions/src --include=*.ts --include=*.tsx)",
+      "Bash(node -e \":*)",
+      "Bash(npx tsx:*)",
+      "Bash(grep -r \"searchResults\\\\|search.*notes\" C:UsersisaacDocumentsCodingquestionssrc --include=*.tsx --include=*.ts)",
+      "Bash(node -e \"const Database = require\\(''better-sqlite3''\\); const sqliteVec = require\\(''sqlite-vec''\\); const path = require\\(''path''\\); const db = new Database\\(path.join\\(process.cwd\\(\\), ''data'', ''questions.db''\\)\\); sqliteVec.load\\(db\\); console.log\\(''vec_questions:'', db.prepare\\(''SELECT count\\(*\\) as c FROM vec_questions''\\).get\\(\\)\\); console.log\\(''vec_notes:'', db.prepare\\(''SELECT count\\(*\\) as c FROM vec_notes''\\).get\\(\\)\\);\")",
+      "Bash(node -e \"process.stdin.resume\\(\\); let d=''''''''; process.stdin.on\\(''''data'''', c=>d+=c\\); process.stdin.on\\(''''end'''', \\(\\)=>{const j=JSON.parse\\(d\\); console.log\\(j.questions.map\\(q=>q.id+'''': ''''+q.text.slice\\(0,60\\)\\)\\);}\\)\")",
+      "Bash(npm view:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

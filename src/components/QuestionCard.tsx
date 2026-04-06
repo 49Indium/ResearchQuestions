@@ -7,13 +7,18 @@ import type { Question } from "@/lib/queries";
 
 interface QuestionCardProps {
   question: Question;
+  focused?: boolean;
 }
 
-export default function QuestionCard({ question }: QuestionCardProps) {
+export default function QuestionCard({ question, focused }: QuestionCardProps) {
   return (
     <Link
       href={`/q/${question.id}`}
-      className="block rounded-lg border border-zinc-200 p-4 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/50"
+      className={`block rounded-lg border p-4 transition-colors ${
+        focused
+          ? "border-blue-400 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/20"
+          : "border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/50"
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
